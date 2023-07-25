@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  services  Service[]
+  employees Person[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+}
+
+model Service {
+  id             Int          @id @default(autoincrement())
+  name           String
+  price          Float        @default(0)
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+}
+
+model Person {
+  id             Int          @id @default(autoincrement())
+  name           String
+  skills         Skill[]
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
+}
+
+model Skill {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique // Enforce uniqueness on skill names
+  persons Person[]
+}
+
+// Junction Table (_PersonToSkill):
+// The `_PersonToSkill` table acts as an intermediary to manage the many-to-many relationship
+// between the `Person` and `Skill` models. It stores pairs of `Person` and `Skill` IDs,
+// indicating the relationships between them.
+// _PersonToSkill
+// +-----------+---------+
+// | person_id | skill_id|
+// +-----------+---------+
+// |      1    |    2    |
+// |      1    |    4    |
+// |      2    |    1    |
+// |      2    |    3    |
+// +-----------+---------+

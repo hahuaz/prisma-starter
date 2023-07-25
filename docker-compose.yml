@@ -1,0 +1,32 @@
+version: "3.8"
+name: prisma-starter
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  express:
+    stdin_open: true
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: express-app
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app # enable reloading
+
+volumes:
+  postgres-data:
