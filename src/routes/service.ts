@@ -72,12 +72,11 @@ router.get("/byname/:serviceName", async (req, res) => {
       },
       take: takeCount,
     });
-    await redis.hSet(
-      REDIS_HASH_KEY,
-      REDIS_HASH_FIELD,
-      JSON.stringify(services)
-    );
-    redis.expire(REDIS_HASH_KEY, 86400); // 24 hours
+    await redis
+      .multi()
+      .hSet(REDIS_HASH_KEY, REDIS_HASH_FIELD, JSON.stringify(services))
+      .expire(REDIS_HASH_KEY, 86400) // 24 hours
+      .exec();
 
     console.log(services);
     res.json(services);
