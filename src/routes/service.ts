@@ -53,6 +53,8 @@ router.get("/byname/:serviceName", async (req, res) => {
   try {
     const cachedServices = await redis.hGet(REDIS_HASH_KEY, REDIS_HASH_FIELD);
     if (cachedServices) {
+      console.log("cachedServices", cachedServices);
+
       const parsedServices = JSON.parse(cachedServices);
       res.json(parsedServices);
       return;
@@ -75,6 +77,7 @@ router.get("/byname/:serviceName", async (req, res) => {
       REDIS_HASH_FIELD,
       JSON.stringify(services)
     );
+    redis.expire(REDIS_HASH_KEY, 86400); // 24 hours
 
     console.log(services);
     res.json(services);
