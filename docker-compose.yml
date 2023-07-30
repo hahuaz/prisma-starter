@@ -18,6 +18,12 @@ services:
     command: /bin/sh -c "redis-server --requirepass redis"
     ports:
       - 6379:6379
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672" # UI
   express:
     stdin_open: true
     environment:
@@ -30,10 +36,20 @@ services:
     depends_on:
       - postgres
       - redis
+      - rabbitmq #TODO rabbitmq queue creation should be seperated from publisher
     ports:
       - "3000:3000"
     volumes:
-      - ./:/app # enable reloading
+      - ./app:/app # enable reloading
+  worker:
+    stdin_open: true
+    build:
+      context: ./worker
+    container_name: worker
+    depends_on:
+      - express
+    volumes:
+      - ./worker:/worker # enable reloading
 
 volumes:
   postgres-data:

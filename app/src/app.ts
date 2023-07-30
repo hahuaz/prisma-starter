@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 
 import redis from "./config/redis";
+import { getRabbitMQChannel } from "./config/rabbitmq";
 
 import {
   organizationRouter,
@@ -26,6 +27,9 @@ app.use("/persons", personRouter);
 // connect to services and start the express app
 const startApp = async () => {
   await redis.connect();
+
+  const rabbitmqChannel = await getRabbitMQChannel();
+  await rabbitmqChannel.assertQueue("validate-name");
 
   app.listen(EXPRESS_PORT, () => {
     console.log(

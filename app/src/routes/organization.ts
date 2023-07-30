@@ -1,7 +1,7 @@
 import express from "express";
 
 import prisma from "../config/prisma";
-import redis from "../config/redis";
+import { getRabbitMQChannel } from "../config/rabbitmq";
 
 const router = express.Router();
 
@@ -46,6 +46,14 @@ router.post("/", async (req, res) => {
 
     console.log(newOrganization);
     res.json(newOrganization);
+
+    // validate name by worker
+    const channel = await getRabbitMQChannel();
+    const message = {
+      organizationId: newOrganization.id,
+      name: newOrganization?.name,
+    };
+    channel.sendToQueue("validate-name", Buffer.from(JSON.stringify(message)));
   } catch (error) {
     console.error("Error creating organization:", error);
     res.status(500).json({ error: "Internal server error" });
