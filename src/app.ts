@@ -1,15 +1,16 @@
 import express, { Application } from "express";
 
+import redis from "./config/redis";
+
 import {
   organizationRouter,
   personRouter,
   serviceRouter,
   skillRouter,
 } from "./routes";
-import prisma from "./config/db";
 
 const app: Application = express();
-const port = 3000;
+const EXPRESS_PORT = 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -22,27 +23,14 @@ app.use("/organizations", organizationRouter);
 app.use("/skills", skillRouter);
 app.use("/persons", personRouter);
 
-async function deleteAllData() {
-  try {
-    // Delete all records from the "Skill" model
-    await prisma.skill.deleteMany();
+// connect to services and start the express app
+const startApp = async () => {
+  await redis.connect();
 
-    // Delete all records from the "Person" model
-    await prisma.person.deleteMany();
-
-    // Delete all records from the "Service" model
-    await prisma.service.deleteMany();
-
-    // Delete all records from the "Organization" model
-    await prisma.organization.deleteMany();
-
-    console.log("All data has been deleted from the database.");
-  } catch (error) {
-    console.error("Error deleting data:", error);
-  }
-}
-// deleteAllData();
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+  app.listen(EXPRESS_PORT, () => {
+    console.log(
+      `You can connect to express app on http://localhost:${EXPRESS_PORT}`
+    );
+  });
+};
+startApp();

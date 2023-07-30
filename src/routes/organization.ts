@@ -1,6 +1,7 @@
 import express from "express";
 
-import prisma from "../config/db";
+import prisma from "../config/prisma";
+import redis from "../config/redis";
 
 const router = express.Router();
 
@@ -47,27 +48,6 @@ router.post("/", async (req, res) => {
     res.json(newOrganization);
   } catch (error) {
     console.error("Error creating organization:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// POST endpoint to create a new service for a specific organization
-router.post("/:id/services", async (req, res) => {
-  try {
-    const organizationId = parseInt(req.params.id);
-    const { name } = req.body;
-
-    const newService = await prisma.service.create({
-      data: {
-        name,
-        organization: { connect: { id: organizationId } },
-      },
-    });
-
-    console.log(newService);
-    res.json(newService);
-  } catch (error) {
-    console.error("Error creating service:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
