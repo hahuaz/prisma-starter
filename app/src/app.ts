@@ -1,28 +1,19 @@
-import express, { Application } from "express";
+import express from "express";
 
 import redis from "./config/redis";
 import { getRabbitMQChannel } from "./config/rabbitmq";
+import router from "./router";
 
-import {
-  organizationRouter,
-  personRouter,
-  serviceRouter,
-  skillRouter,
-} from "./routes";
-
-const app: Application = express();
 const EXPRESS_PORT = 3000;
 
+const app = express();
+
+// parse application/x-www-form-urlencoded body
 app.use(express.urlencoded({ extended: true }));
+// parse application/json body
 app.use(express.json());
 
-app.get("/", async (_req, res) => {
-  res.send("Hello World!");
-});
-app.use("/services", serviceRouter);
-app.use("/organizations", organizationRouter);
-app.use("/skills", skillRouter);
-app.use("/persons", personRouter);
+router(app);
 
 // connect to services and start the express app
 const startApp = async () => {
