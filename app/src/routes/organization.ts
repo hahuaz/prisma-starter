@@ -64,10 +64,11 @@ router.post("/", async (req, res) => {
 router.post("/:id/employee", async (req, res) => {
   try {
     const organizationId = parseInt(req.params.id);
-    const { name } = req.body;
+    const { name, lastName } = req.body;
 
     const newEmployee = await prisma.person.create({
       data: {
+        lastName,
         name,
         organization: { connect: { id: organizationId } },
       },

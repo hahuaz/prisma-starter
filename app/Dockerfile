@@ -7,6 +7,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 RUN npm install
+# generate prisma client in the node_modules of the container
+RUN npx prisma generate
 
 COPY . .
 

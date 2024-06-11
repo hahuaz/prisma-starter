@@ -1,5 +1,5 @@
 version: "3.8"
-name: prisma-starter
+name: express-starter
 services:
   postgres:
     image: postgres:latest
