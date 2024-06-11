@@ -1,3 +1,4 @@
+// npx prisma migrate generate to create client in the node_modules folder otherwise ts will won't be able to find the client and will throw an error
 import { PrismaClient } from "@prisma/client";
 
 if (!process.env.DATABASE_URL) {

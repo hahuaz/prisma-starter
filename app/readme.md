@@ -1,3 +1,7 @@
+TODO:
+1. start the app after build
+
+
 ## How to apply prisma migrations via container
 1. Up docker-compose
 ```bash
@@ -19,8 +23,8 @@ This will apply the migration to the database.
 
 6. If prisma client is not updated, run the following command to regenerate the prisma client:
 ```bash
-npx prisma migrate generate
-docker-compose exec <service-name> npx prisma migrate generate
+npx prisma generate
+docker-compose exec <service-name> npx prisma generate
 ```
 This will generate the prisma client in the node_modules folder. After every migration, the prisma client needs to be regenerated otherwise the changes will not be reflected in the client.
 The prisma client enables you to interact with the database with type safety and autocompletion.

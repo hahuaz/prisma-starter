@@ -1,8 +1,8 @@
 import express from "express";
 
-import redis from "./config/redis";
-import { getRabbitMQChannel } from "./config/rabbitmq";
-import router from "./router";
+import redis from "@/config/redis";
+import { getRabbitMQChannel } from "@/config/rabbitmq";
+import router from "@/router";
 
 const EXPRESS_PORT = 3000;
 

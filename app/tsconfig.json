@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2016" /* Set the JavaScript language version for emitted 
-    "module": "commonjs" /* Specify what module code is generated. */,
+    "target": "es2018",
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true,
 
-    "esModuleInterop": true /* Emit additional JavaScript to ease support for commonJS modules. */,
-    "module": "commonjs" /* Specify what module code is generated. */,
-    "strict": true /* Enable all strict type-checking options. */,
-
-    "sourceMap": true
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+
+  // following allows to use `@` alias in ts-node
+  // Do not forget to `npm i -D tsconfig-paths`
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }

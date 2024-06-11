@@ -1,7 +1,7 @@
 import express from "express";
 
-import prisma from "../config/prisma";
-import redis from "../config/redis";
+import prisma from "@/config/prisma";
+import redis from "@/config/redis";
 
 const router = express.Router();
 

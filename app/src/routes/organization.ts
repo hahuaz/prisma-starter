@@ -1,7 +1,7 @@
 import express from "express";
 
-import prisma from "../config/prisma";
-import { getRabbitMQChannel } from "../config/rabbitmq";
+import prisma from "@/config/prisma";
+import { getRabbitMQChannel } from "@/config/rabbitmq";
 
 const router = express.Router();
 

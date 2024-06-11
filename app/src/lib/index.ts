@@ -1,3 +1,5 @@
+import prisma from "@/config/prisma";
+
 async function deleteAllData() {
   try {
     // Delete all records from the "Skill" model
