@@ -5,7 +5,7 @@ import {
   personRouter,
   serviceRouter,
   skillRouter,
-} from "@/routes";
+} from "./routes";
 
 /**
  * Setup the routes for the express app

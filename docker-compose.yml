@@ -32,7 +32,7 @@ services:
     build:
       context: ./app/ # path to the directory containing the Dockerfile
       dockerfile: Dockerfile
-    container_name: express-app
+    container_name: express
     depends_on:
       - postgres
       - redis
