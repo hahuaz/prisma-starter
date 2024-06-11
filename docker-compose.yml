@@ -27,10 +27,10 @@ services:
   express:
     stdin_open: true
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres?schema=public # {service}://{username}:{password}@{host}:{port}
-      - REDIS_URL=redis://:redis@redis:6379 # {service}://{username}:{password}@{host}:{port}
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres?schema=public # {serviceName}://{username}:{password}@{host}:{port}
+      - REDIS_URL=redis://:redis@redis:6379 # {serviceName}://{username}:{password}@{host}:{port}
     build:
-      context: .
+      context: ./app/ # path to the directory containing the Dockerfile
       dockerfile: Dockerfile
     container_name: express-app
     depends_on:
@@ -40,7 +40,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./app:/app # enable reloading
+      - ./app:/app # sync files between host and container to enable hot-reloading
+      - /app/node_modules # do not share node_modules from host to container. Basically, you are specifying the directories that shouldn't be reloaded in the container
   worker:
     stdin_open: true
     build:
@@ -49,7 +50,8 @@ services:
     depends_on:
       - express
     volumes:
-      - ./worker:/worker # enable reloading
+      - ./worker:/worker
+      - /worker/node_modules
 
 volumes:
   postgres-data:
