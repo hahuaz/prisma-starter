@@ -38,13 +38,15 @@ router.get("/by-skill/:skillName", async (req, res) => {
 
 interface CreatePersonRequest {
   name: string;
+  lastName: string;
   organizationId: number;
   skills: string[]; // An array of skill names
 }
 
 // POST create a new person with organization ID from request and include skills
 router.post("/", async (req, res) => {
-  const { name, organizationId, skills }: CreatePersonRequest = req.body;
+  const { name, organizationId, skills, lastName }: CreatePersonRequest =
+    req.body;
 
   try {
     // Check if the organization exists before creating the person
@@ -62,6 +64,7 @@ router.post("/", async (req, res) => {
     const newPerson = await prisma.person.create({
       data: {
         name,
+        lastName,
         organization: {
           connect: {
             id: organizationId,
