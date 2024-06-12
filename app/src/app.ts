@@ -2,16 +2,14 @@ import express from "express";
 
 import { getRabbitMQChannel } from "@/config/rabbitmq";
 import redis from "@/config/redis";
+import middleware from "@/middleware";
 import router from "@/router";
 
 const EXPRESS_PORT = 3000;
 
 const app = express();
 
-// parse application/x-www-form-urlencoded body
-app.use(express.urlencoded({ extended: true }));
-// parse application/json body
-app.use(express.json());
+middleware(app);
 
 router(app);
 

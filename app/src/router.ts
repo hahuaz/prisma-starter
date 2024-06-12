@@ -13,7 +13,7 @@ import {
 const router = (app: Express) => {
   return app
     .get("/", async (_req: Request, res: Response) => {
-      res.json({ message: "App is up and running" });
+      res.json({ message: "The app is up and running" });
     })
     .use("/services", serviceRouter)
     .use("/organizations", organizationRouter)
