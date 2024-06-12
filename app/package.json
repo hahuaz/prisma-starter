@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon",
     "type-check": "tsc --noEmit",
     "build": "tsc",
     "test": "jest"
