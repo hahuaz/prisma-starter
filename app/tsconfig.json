@@ -4,8 +4,10 @@
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
-
     "esModuleInterop": true,
+    "experimentalDecorators": true, // for decorators. typeorm uses them
+    "emitDecoratorMetadata": true, // for decorators. typeorm uses them
+
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
