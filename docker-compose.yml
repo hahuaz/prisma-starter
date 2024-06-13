@@ -2,37 +2,34 @@ version: "3.8"
 name: express-starter
 services:
   postgres:
-    image: postgres:latest
     container_name: postgres
+    image: postgres:latest
+    env_file:
+      - .env.local
     ports:
       - 5432:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
   redis:
-    image: redis:latest
     container_name: redis
+    image: redis:latest
     command: /bin/sh -c "redis-server --requirepass redis"
     ports:
       - 6379:6379
   rabbitmq:
-    image: rabbitmq:management
     container_name: rabbitmq
+    image: rabbitmq:management
     ports:
       - "5672:5672"
       - "15672:15672" # UI
   express:
+    container_name: express
     stdin_open: true
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres?schema=public # {serviceName}://{username}:{password}@{host}:{port}
-      - REDIS_URL=redis://:redis@redis:6379 # {serviceName}://{username}:{password}@{host}:{port}
+    env_file:
+      - .env.local
     build:
       context: ./app/ # path to the directory containing the Dockerfile
       dockerfile: Dockerfile
-    container_name: express
     depends_on:
       - postgres
       - redis
@@ -43,10 +40,10 @@ services:
       - ./app:/app # sync files between host and container to enable hot-reloading
       - /app/node_modules # do not share node_modules from host to container. Basically, you are specifying the directories that shouldn't be reloaded in the container
   worker:
+    container_name: worker
     stdin_open: true
     build:
       context: ./worker
-    container_name: worker
     depends_on:
       - express
     volumes:

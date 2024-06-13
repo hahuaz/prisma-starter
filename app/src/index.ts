@@ -5,7 +5,7 @@ import redis from "@/config/redis";
 import middleware from "@/middleware";
 import router from "@/router";
 
-const EXPRESS_PORT = 3000;
+const { APP_PORT } = process.env;
 
 const app = express();
 
@@ -13,16 +13,18 @@ middleware(app);
 
 router(app);
 
-// connect to services and start the express app
+/**
+ * Connect to services and start the app
+ */
 const startApp = async () => {
   await redis.connect();
 
   const rabbitmqChannel = await getRabbitMQChannel();
   await rabbitmqChannel.assertQueue("validate-name");
 
-  app.listen(EXPRESS_PORT, () => {
+  app.listen(APP_PORT, () => {
     console.log(
-      `You can connect to express app on http://localhost:${EXPRESS_PORT}`
+      `You can connect to express app on http://localhost:${APP_PORT}`
     );
   });
 };
