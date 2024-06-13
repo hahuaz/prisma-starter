@@ -10,7 +10,7 @@ import {
 /**
  * Setup the routes for the express app
  */
-const router = (app: Express) => {
+export const router = (app: Express) => {
   return app
     .get("/", async (_req: Request, res: Response) => {
       res.json({ message: "The app is up and running" });
@@ -20,5 +20,3 @@ const router = (app: Express) => {
     .use("/skills", skillRouter)
     .use("/persons", personRouter);
 };
-
-export default router;

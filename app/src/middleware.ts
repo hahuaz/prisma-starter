@@ -5,7 +5,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 /**
  * Centralized middleware config for the express app
  */
-const middleware = (app: Express) => {
+export const middleware = (app: Express) => {
   // enable CORS for dev mode
   NODE_ENV === "development" &&
     app.use((_req, res, next) => {
@@ -29,5 +29,3 @@ const middleware = (app: Express) => {
       .use(express.json())
   );
 };
-
-export default middleware;

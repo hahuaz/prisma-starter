@@ -33,7 +33,7 @@ services:
     depends_on:
       - postgres
       - redis
-      - rabbitmq #TODO rabbitmq queue creation should be seperated from publisher
+      - rabbitmq
     ports:
       - "3000:3000"
     volumes:
