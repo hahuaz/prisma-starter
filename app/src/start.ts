@@ -2,6 +2,7 @@ import { Express } from "express";
 
 import { getRabbitMQChannel } from "@/config/rabbitmq";
 import redis from "@/config/redis";
+import { connectDrizzle } from "@/db/drizzle";
 
 const { APP_PORT } = process.env;
 
@@ -9,10 +10,12 @@ const { APP_PORT } = process.env;
  * Connect to services and start the app
  */
 export const start = async (app: Express) => {
+  // await typeORMConnect();
+  await connectDrizzle();
+
   await redis.connect();
 
   const rabbitmqChannel = await getRabbitMQChannel();
-
   // TODO rabbitmq queue creation should be seperated from publisher
   await rabbitmqChannel.assertQueue("validate-name");
 

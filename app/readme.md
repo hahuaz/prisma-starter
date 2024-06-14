@@ -2,26 +2,46 @@ TODO:
 1. start the app after build
 
 
+## how to apply drizzle migrations via container
+1. Up docker-compose
+```bash
+docker-compose up --build
+```
+2. Apply model changes to the drizzle schema file.
+3. Run the following command to generate the migration files:
+```bash
+npx drizzle-kit generate
+```
+This will generate migration files in the migrations folder. Thanks to the volume mapping in the docker-compose file, every change made in the app folder will be reflected in the container, including the migrations folder.
+4. Run the following commands to apply the migration via container:
+```bash
+docker-compose config --services
+docker-compose exec <service-name> npm run drizzle:migrate
+```
+This will run `migrate.ts` file in the migrations folder and apply the migration to the database.
+
+
+
 ## How to apply prisma migrations via container
 1. Up docker-compose
 ```bash
 docker-compose up --build
 ```
-3. Apply model changes to the schema.prisma file.
-4. Run the following command to generate the migration:
+2. Apply model changes to the schema.prisma file.
+3. Run the following command to generate the migration:
 ```bash
 npx prisma migrate dev --name <migration-name>
 ```
 This will generate a migration file in the migrations folder. Thanks to the volume mapping in the docker-compose file, every change made in the app folder will be reflected in the container, including the migrations folder.
 
-5. Run the following commands to apply the migration via container:
+4. Run the following commands to apply the migration via container:
 ```bash
 docker-compose config --services
 docker-compose exec <service-name> npx prisma migrate deploy
 ```
 This will apply the migration to the database.
 
-6. If prisma client is not updated, run the following command to regenerate the prisma client:
+5. If prisma client is not updated, run the following command to regenerate the prisma client:
 ```bash
 npx prisma generate
 docker-compose exec <service-name> npx prisma generate
