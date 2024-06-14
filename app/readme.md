@@ -3,14 +3,15 @@ TODO:
 
 
 ## how to apply drizzle migrations via container
-1. Up docker-compose
-```bash
-docker-compose up --build
-```
-2. Apply model changes to the drizzle schema file.
-3. Run the following command to generate the migration files:
+
+1. Apply model changes to the drizzle schema file.
+2. Run the following command to generate the migration files:
 ```bash
 npx drizzle-kit generate
+```
+3. Up docker-compose
+```bash
+docker-compose up --build
 ```
 This will generate migration files in the migrations folder. Thanks to the volume mapping in the docker-compose file, every change made in the app folder will be reflected in the container, including the migrations folder.
 4. Run the following commands to apply the migration via container:
