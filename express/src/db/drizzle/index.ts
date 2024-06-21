@@ -1,6 +1,8 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 
+import * as schema from "./schema";
+
 const { DATABASE_URL } = process.env;
 
 if (!DATABASE_URL) {
@@ -18,7 +20,9 @@ export const client = new Client({
 /**
  * Drizzle instance
  */
-export const db = drizzle(client);
+export const db = drizzle(client, {
+  schema,
+});
 
 export async function connectDrizzle() {
   try {

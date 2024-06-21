@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "type-check": "tsc --noEmit",
     "build": "tsc",
+    "drizzle:generate": "npx drizzle-kit generate",
     "drizzle:migrate": "cd ./src/db/drizzle && ts-node migrate"
   },
   "keywords": [],

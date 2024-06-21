@@ -28,7 +28,7 @@ services:
     env_file:
       - .env.local
     build:
-      context: ./app/ # path to the directory containing the Dockerfile
+      context: ./express/ # path to the directory containing the Dockerfile
       dockerfile: Dockerfile
     depends_on:
       - postgres
@@ -37,8 +37,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./app:/app # sync files between host and container to enable hot-reloading
-      - /app/node_modules # do not share node_modules from host to container. Basically, you are specifying the directories that shouldn't be reloaded in the container
+      - ./express:/express # sync files between host and container to enable hot-reloading
+      - /express/node_modules # do not share node_modules from host to container. Basically, you are specifying the directories that shouldn't be reloaded in the container
   worker:
     container_name: worker
     stdin_open: true

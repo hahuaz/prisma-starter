@@ -9,3 +9,4 @@ middleware(app);
 router(app);
 
 start(app);
+console.log("Hello, world!");
