@@ -1,8 +1,9 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import express from "express";
 
 import { db } from "@/db/drizzle";
 import { users } from "@/db/drizzle/schema";
+import { orderByMiddleware } from "@/middlewares";
 
 export const usersRouter = express.Router();
 
@@ -15,18 +16,6 @@ usersRouter.post("/", async (req, res) => {
       .values({ username, email, passwordHash })
       .returning();
     res.status(201).json(newUser);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get all users
-usersRouter.get("/", async (_req, res) => {
-  try {
-    const allUsers = await db
-      .select({ field1: users.id, field2: users.username, field3: users.email })
-      .from(users);
-    res.status(200).json(allUsers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -74,6 +63,32 @@ usersRouter.delete("/:id", async (req, res) => {
   try {
     await db.delete(users).where(eq(users.id, intId));
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all users
+usersRouter.get("/", orderByMiddleware, async (_req, res) => {
+  const { orderByColumn, orderByDirection } = res.locals;
+
+  const orderByCb =
+    orderByDirection === "desc"
+      ? desc(users[orderByColumn])
+      : users[orderByColumn];
+
+  try {
+    const allUsers = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .orderBy(orderByCb);
+
+    res.status(200).json(allUsers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -21,7 +21,7 @@ export const start = async (app: Express) => {
 
   app.listen(APP_PORT, () => {
     console.log(
-      `You can connect to express app on http://localhost:${APP_PORT}`
+      `You can ping to express app on http://localhost:${APP_PORT}/ping`
     );
   });
 };
