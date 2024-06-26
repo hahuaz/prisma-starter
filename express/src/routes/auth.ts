@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import express from "express";
 import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
 import { authentications, users } from "@/db/drizzle/schema";
+import { autheMiddleware } from "@/middleware";
 
 export const authRouter = express.Router();
 
@@ -50,21 +51,41 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-// // Protected route example
-// authRouter.get("/profile", authenticateToken, async (req, res) => {
-//   try {
-//     const user = await db
-//       .select()
-//       .from(users)
-//       .where(eq(users.id, req.user.userId))
-//       .single();
+// Logout route
+authRouter.post("/logout", autheMiddleware, async (req, res) => {
+  let {
+    tokenVerifyPayload: { userId },
+    token,
+  } = res.locals;
 
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
+  try {
+    token = req.headers.authorization?.split(" ")[1];
+    const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: number };
+    userId = decodedToken.userId;
+  } catch (error) {
+    console.error(error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
 
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });
+  try {
+    const { rowCount } = await db
+      .update(authentications)
+      .set({
+        isRevoked: 1,
+      })
+      .where(
+        and(
+          eq(authentications.userId, userId),
+          eq(authentications.token, token)
+        )
+      );
+
+    if (rowCount === 0) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    return res.status(200).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});

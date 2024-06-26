@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import express, { Express, NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
 import { authentications, userRoles, users } from "@/db/drizzle/schema";
 
-const { EXPRESS_SECRET: JWT_SECRET } = process.env;
-if (!JWT_SECRET) {
-  console.error("JWT_SECRET is not set");
+const { EXPRESS_SECRET } = process.env;
+if (!EXPRESS_SECRET) {
+  console.error("EXPRESS_SECRET is not set");
   process.exit(1);
 }
 
@@ -50,24 +50,28 @@ export const autheMiddleware = async (
   }
 
   try {
-    tokenVerifyPayload = jwt.verify(token, JWT_SECRET);
+    tokenVerifyPayload = jwt.verify(token, EXPRESS_SECRET);
+    if (typeof tokenVerifyPayload !== "object")
+      throw new Error("Invalid token");
   } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Invalid token" });
   }
 
   try {
     const [auth] = await db
       .select()
       .from(authentications)
-      .where(eq(authentications.token, token));
+      .where(
+        and(eq(authentications.token, token), eq(authentications.isRevoked, 0))
+      );
 
     if (!auth) {
-      console.log("No auth found after token verification", req);
+      console.log("No auth record found after token verification");
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    console.log("tokenVerifyPayload", tokenVerifyPayload);
-    res.locals.user = tokenVerifyPayload.userId;
+    res.locals.tokenVerifyPayload = tokenVerifyPayload;
+    res.locals.token = token;
 
     next();
   } catch (error) {
