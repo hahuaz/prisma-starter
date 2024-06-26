@@ -1,4 +1,15 @@
+import { eq } from "drizzle-orm";
 import { NextFunction, Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
+
+import { db } from "@/db/drizzle";
+import { authentications, userRoles, users } from "@/db/drizzle/schema";
+
+const { EXPRESS_SECRET: JWT_SECRET } = process.env;
+if (!JWT_SECRET) {
+  console.error("JWT_SECRET is not set");
+  process.exit(1);
+}
 
 /**
  * Middleware to parse and attach orderBy query params to request object
@@ -18,3 +29,78 @@ export function orderByMiddleware(
 
   next();
 }
+
+/**
+ * Middleware to authenticate the user
+ */
+export const autheMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(" ")[1];
+
+  let tokenVerifyPayload;
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ error: "Access token is missing or invalid" });
+  }
+
+  try {
+    tokenVerifyPayload = jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+
+  try {
+    const [auth] = await db
+      .select()
+      .from(authentications)
+      .where(eq(authentications.token, token));
+
+    if (!auth) {
+      console.log("No auth found after token verification", req);
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    console.log("tokenVerifyPayload", tokenVerifyPayload);
+    res.locals.user = tokenVerifyPayload.userId;
+
+    next();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Middleware to authorize the user
+ *
+ * This middleware checks if the user has the required role to access the resource
+ */
+export const authoMiddleware = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user } = res.locals;
+
+  try {
+    const [userRole] = await db
+      .select()
+      .from(userRoles)
+      .where(eq(userRoles.userId, user));
+
+    // TODO: Check if the user has the required role to access the resource
+
+    if (!userRole) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

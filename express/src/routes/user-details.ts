@@ -43,7 +43,11 @@ userDetailsRouter.get("/:id", async (req, res) => {
     const details = await db
       .select()
       .from(userDetails)
-      .where(eq(userDetails.id, intId));
+      .where(eq(userDetails.id, intId))
+      // you can use left table data(userDetails) in the join condition
+      .leftJoin(users, eq(users.id, userDetails.userId));
+
+    console.log(details);
     if (details.length > 0) {
       res.status(200).json(details[0]);
     } else {

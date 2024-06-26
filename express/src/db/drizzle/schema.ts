@@ -11,7 +11,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const roleEnum = pgEnum("role", ["admin", "editor", "viewer"]);
+export const ROLES = ["admin", "editor", "viewer"] as const;
+
+export const roleEnum = pgEnum("role", ROLES);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -54,12 +56,27 @@ export const userDetails = pgTable("user_details", {
     .$onUpdateFn(() => sql`update_counter + 1`),
 });
 
+/**
+ * Reasons for saving the authentication token in the database even though using JWT:
+ * 1. To revoke the token if needed
+ * - If the user logs out, the token can be deleted from the database
+ * - If the user changes their password, the token can be deleted from the database
+ * - If the user's account is deleted, the token can be deleted from the database
+ * - If the user's role is changed, the token can be deleted from the database
+ * - If the user's account is locked, the token can be deleted from the database
+ * 2. To keep track of the user's active sessions
+ * 3. To keep track of the user's login history
+ *
+ */
 export const authentications = pgTable("authentications", {
   id: serial("id").primaryKey(),
   // authentications to users is many-to-one so no unique constraint
-  userId: integer("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
   token: varchar("token", { length: 512 }),
   expiresAt: varchar("expires_at", { length: 256 }),
+  isRevoked: integer("is_revoked").default(sql`0`),
 });
 
 export const roles = pgTable("roles", {

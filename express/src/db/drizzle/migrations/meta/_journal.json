@@ -36,6 +36,13 @@
       "when": 1719004403851,
       "tag": "0004_black_luke_cage",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1719313616954,
+      "tag": "0005_amused_red_skull",
+      "breakpoints": true
     }
   ]
 }
