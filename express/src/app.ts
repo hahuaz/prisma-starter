@@ -1,10 +1,16 @@
 import express from "express";
 
-import { middleware, router, start } from "@/index";
+import { corsMiddleware } from "@/middleware";
+import { router } from "@/router";
+import { start } from "@/start";
 
 const app = express();
 
-middleware(app);
+// parse application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+// parse application/json
+app.use(express.json());
+app.use(corsMiddleware);
 
 router(app);
 

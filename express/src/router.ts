@@ -2,7 +2,7 @@ import { Express, Request, Response } from "express";
 
 import { authRouter, userDetailsRouter, usersRouter } from "@/routes";
 
-import { autheMiddleware } from "./middlewares";
+import { autheMiddleware } from "./middleware";
 
 /**
  * Setup the routes for the express app

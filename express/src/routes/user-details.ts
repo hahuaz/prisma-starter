@@ -3,7 +3,7 @@ import express from "express";
 
 import { db } from "@/db/drizzle";
 import { userDetails, users } from "@/db/drizzle/schema";
-import { orderByMiddleware } from "@/middlewares";
+import { orderByMiddleware } from "@/middleware";
 
 export const userDetailsRouter = express.Router();
 

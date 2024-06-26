@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { NextFunction, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
@@ -103,4 +103,25 @@ export const authoMiddleware = async (
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+/**
+ * Middleware to enable CORS for development mode
+ */
+export const corsMiddleware = (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (process.env.NODE_ENV !== "development") {
+    return next();
+  }
+
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
 };
