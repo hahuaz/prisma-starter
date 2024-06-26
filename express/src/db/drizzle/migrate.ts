@@ -2,6 +2,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Client } from "pg";
 
+import { ROLES, roles } from "./schema";
+
 const { DATABASE_URL } = process.env;
 
 if (!DATABASE_URL) {
@@ -21,6 +23,11 @@ async function migrateDb() {
     await migrate(db, {
       migrationsFolder: "./migrations",
     });
+
+    // pre-populate roles table with default roles if not already present
+    const valuesConfig = ROLES.map((role) => ({ name: role }));
+    await db.insert(roles).values(valuesConfig).onConflictDoNothing();
+
     console.log("Migrations complete");
   } catch (error) {
     console.error("Error migrating the database", error);

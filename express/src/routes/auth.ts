@@ -4,7 +4,7 @@ import express from "express";
 import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
-import { authentications, users } from "@/db/drizzle/schema";
+import { authentications, userRoles, users } from "@/db/drizzle/schema";
 import { autheMiddleware } from "@/middleware";
 
 export const authRouter = express.Router();
@@ -21,10 +21,8 @@ authRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [user, _] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email));
+    // Check if user exists
+    const [user] = await db.select().from(users).where(eq(users.email, email));
 
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
@@ -35,9 +33,19 @@ authRouter.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ userId: user.id }, EXPRESS_SECRET, {
-      expiresIn: TOKEN_EXPIRATION,
-    });
+    // Get user role from join table
+    const [userRole] = await db
+      .select()
+      .from(userRoles)
+      .where(eq(authentications.userId, user.id));
+
+    const token = jwt.sign(
+      { userId: user.id, roleId: userRole.roleId },
+      EXPRESS_SECRET,
+      {
+        expiresIn: TOKEN_EXPIRATION,
+      }
+    );
 
     await db.insert(authentications).values({
       userId: user.id,

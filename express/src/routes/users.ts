@@ -3,11 +3,13 @@ import { desc, eq } from "drizzle-orm";
 import express from "express";
 
 import { db } from "@/db/drizzle";
-import { userDetails, users } from "@/db/drizzle/schema";
+import { roles, userDetails, userRoles, users } from "@/db/drizzle/schema";
 import { orderByMiddleware } from "@/middleware";
 import { autheMiddleware } from "@/middleware";
 
 export const usersRouter = express.Router();
+
+let viewerRoleId: number;
 
 // Create a new user
 usersRouter.post("/", async (req, res) => {
@@ -17,10 +19,30 @@ usersRouter.post("/", async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
 
   try {
-    const newUser = await db
+    const [newUser] = await db
       .insert(users)
       .values({ username, email, passwordHash })
-      .returning();
+      .returning({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+      });
+
+    if (!viewerRoleId) {
+      const [viewerRole] = await db
+        .select()
+        .from(roles)
+        .where(eq(roles.name, "viewer"));
+
+      viewerRoleId = viewerRole.id;
+    }
+
+    // assign viewer role to the new user
+    await db.insert(userRoles).values({
+      userId: newUser.id,
+      roleId: viewerRoleId,
+    });
+
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: error.message });

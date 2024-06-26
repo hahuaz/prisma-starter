@@ -81,7 +81,7 @@ export const authentications = pgTable("authentications", {
 
 export const roles = pgTable("roles", {
   id: serial("id").primaryKey(),
-  roleName: roleEnum("role").notNull().unique(),
+  name: roleEnum("role").notNull().unique(),
 });
 
 // JOIN TABLES
