@@ -6,8 +6,6 @@
     "sourceMap": true,
     "esModuleInterop": true,
     // "skipLibCheck": false, //
-    "experimentalDecorators": true, // for decorators. typeorm uses them
-    "emitDecoratorMetadata": true, // for decorators. typeorm uses them
 
     "baseUrl": "./",
     "paths": {

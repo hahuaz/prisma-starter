@@ -9,12 +9,12 @@ import { autheMiddleware } from "@/middleware";
 
 export const authRouter = express.Router();
 
-const { EXPRESS_SECRET: JWT_SECRET } = process.env;
-if (!JWT_SECRET) {
-  console.error("JWT_SECRET is not set");
+const { EXPRESS_SECRET } = process.env;
+if (!EXPRESS_SECRET) {
+  console.error("EXPRESS_SECRET is not set");
   process.exit(1);
 }
-const TOKEN_EXPIRATION = "1h"; // Token expiration time
+const TOKEN_EXPIRATION = "1h";
 
 // Login route
 authRouter.post("/login", async (req, res) => {
@@ -35,7 +35,7 @@ authRouter.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user.id }, EXPRESS_SECRET, {
       expiresIn: TOKEN_EXPIRATION,
     });
 
@@ -60,7 +60,9 @@ authRouter.post("/logout", autheMiddleware, async (req, res) => {
 
   try {
     token = req.headers.authorization?.split(" ")[1];
-    const decodedToken = jwt.verify(token, JWT_SECRET) as { userId: number };
+    const decodedToken = jwt.verify(token, EXPRESS_SECRET) as {
+      userId: number;
+    };
     userId = decodedToken.userId;
   } catch (error) {
     console.error(error);
