@@ -5,6 +5,7 @@ import express from "express";
 import { db } from "@/db/drizzle";
 import { userDetails, users } from "@/db/drizzle/schema";
 import { orderByMiddleware } from "@/middleware";
+import { autheMiddleware } from "@/middleware";
 
 export const usersRouter = express.Router();
 
@@ -27,7 +28,7 @@ usersRouter.post("/", async (req, res) => {
 });
 
 // Get a single user by ID along with user details
-usersRouter.get("/:id", async (req, res) => {
+usersRouter.get("/:id", autheMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
 
@@ -58,7 +59,7 @@ usersRouter.get("/:id", async (req, res) => {
 });
 
 // Update a user by ID
-usersRouter.patch("/:id", async (req, res) => {
+usersRouter.patch("/:id", autheMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   const { username, email, passwordHash } = req.body;
@@ -75,7 +76,7 @@ usersRouter.patch("/:id", async (req, res) => {
 });
 
 // Delete a user by ID
-usersRouter.delete("/:id", async (req, res) => {
+usersRouter.delete("/:id", autheMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   try {
@@ -87,7 +88,7 @@ usersRouter.delete("/:id", async (req, res) => {
 });
 
 // Get all users
-usersRouter.get("/", orderByMiddleware, async (_req, res) => {
+usersRouter.get("/", autheMiddleware, orderByMiddleware, async (_req, res) => {
   const { orderByColumn, orderByDirection } = res.locals;
 
   const orderByCb =

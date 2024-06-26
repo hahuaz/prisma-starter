@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 
 import { authRouter, userDetailsRouter, usersRouter } from "@/routes";
 
-import { autheMiddleware, corsMiddleware } from "./middleware";
+import { corsMiddleware } from "./middleware";
 
 const apiRouter = express.Router();
 
@@ -12,16 +12,13 @@ apiRouter.use(express.urlencoded({ extended: true }));
 apiRouter.use(express.json());
 apiRouter.use(corsMiddleware);
 
-// Unprotected routes
 apiRouter
   .get("/ping", async (_req: Request, res: Response) => {
     res.json({ message: "pong" });
   })
-  .use("/auth", authRouter);
-
-// Protected routes
-apiRouter.use(autheMiddleware);
-apiRouter.use("/users", usersRouter).use("/user-details", userDetailsRouter);
+  .use("/auth", authRouter)
+  .use("/users", usersRouter)
+  .use("/user-details", userDetailsRouter);
 
 /**
  * Setup the routes for the express app
