@@ -1,24 +1,33 @@
-import { Express, Request, Response } from "express";
+import express, { Express, Request, Response } from "express";
 
 import { authRouter, userDetailsRouter, usersRouter } from "@/routes";
 
-import { autheMiddleware } from "./middleware";
+import { autheMiddleware, corsMiddleware } from "./middleware";
+
+const apiRouter = express.Router();
+
+// parse application/x-www-form-urlencoded in api routes
+apiRouter.use(express.urlencoded({ extended: true }));
+// parse application/json in api routes
+apiRouter.use(express.json());
+apiRouter.use(corsMiddleware);
+
+// Unprotected routes
+apiRouter
+  .get("/ping", async (_req: Request, res: Response) => {
+    res.json({ message: "pong" });
+  })
+  .use("/auth", authRouter);
+
+// Protected routes
+apiRouter.use(autheMiddleware);
+apiRouter.use("/users", usersRouter).use("/user-details", userDetailsRouter);
 
 /**
  * Setup the routes for the express app
  */
-export const router = (app: Express) => {
-  // Unprotected routes
-  app
-    .get("/api/ping", async (_req: Request, res: Response) => {
-      res.json({ message: "pong" });
-    })
-    .use("/api/auth", authRouter);
-
-  // Protected routes
-  app
-    .use("/api/users", autheMiddleware, usersRouter)
-    .use("/api/user-details", autheMiddleware, userDetailsRouter);
+export const setupRouter = (app: Express) => {
+  app.use("/api", apiRouter);
 
   return app;
 };
