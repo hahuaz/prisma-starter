@@ -4,8 +4,11 @@ import express from "express";
 
 import { db } from "@/db/drizzle";
 import { roles, userDetails, userRoles, users } from "@/db/drizzle/schema";
-import { orderByMiddleware } from "@/middleware";
-import { autheMiddleware } from "@/middleware";
+import {
+  authnMiddleware,
+  authzMiddleware,
+  orderByMiddleware,
+} from "@/middleware";
 
 export const usersRouter = express.Router();
 
@@ -50,7 +53,7 @@ usersRouter.post("/", async (req, res) => {
 });
 
 // Get a single user by ID along with user details
-usersRouter.get("/:id", autheMiddleware, async (req, res) => {
+usersRouter.get("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
 
@@ -81,7 +84,7 @@ usersRouter.get("/:id", autheMiddleware, async (req, res) => {
 });
 
 // Update a user by ID
-usersRouter.patch("/:id", autheMiddleware, async (req, res) => {
+usersRouter.patch("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   const { username, email, passwordHash } = req.body;
@@ -98,7 +101,7 @@ usersRouter.patch("/:id", autheMiddleware, async (req, res) => {
 });
 
 // Delete a user by ID
-usersRouter.delete("/:id", autheMiddleware, async (req, res) => {
+usersRouter.delete("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   try {
@@ -110,28 +113,34 @@ usersRouter.delete("/:id", autheMiddleware, async (req, res) => {
 });
 
 // Get all users
-usersRouter.get("/", autheMiddleware, orderByMiddleware, async (_req, res) => {
-  const { orderByColumn, orderByDirection } = res.locals;
+usersRouter.get(
+  "/",
+  authnMiddleware,
+  authzMiddleware,
+  orderByMiddleware,
+  async (_req, res) => {
+    const { orderByColumn, orderByDirection } = res.locals;
 
-  const orderByCb =
-    orderByDirection === "desc"
-      ? desc(users[orderByColumn])
-      : users[orderByColumn];
+    const orderByCb =
+      orderByDirection === "desc"
+        ? desc(users[orderByColumn])
+        : users[orderByColumn];
 
-  try {
-    const allUsers = await db
-      .select({
-        id: users.id,
-        username: users.username,
-        email: users.email,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      })
-      .from(users)
-      .orderBy(orderByCb);
+    try {
+      const allUsers = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          email: users.email,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        })
+        .from(users)
+        .orderBy(orderByCb);
 
-    res.status(200).json(allUsers);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(200).json(allUsers);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);

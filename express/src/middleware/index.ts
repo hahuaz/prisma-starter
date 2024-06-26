@@ -3,7 +3,8 @@ import express, { Express, NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
-import { authentications, userRoles, users } from "@/db/drizzle/schema";
+import { authentications, roles, userRoles, users } from "@/db/drizzle/schema";
+import { normalizePath } from "@/lib";
 
 const { EXPRESS_SECRET } = process.env;
 if (!EXPRESS_SECRET) {
@@ -33,7 +34,7 @@ export function orderByMiddleware(
 /**
  * Middleware to authenticate the user
  */
-export const autheMiddleware = async (
+export const authnMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,7 +42,7 @@ export const autheMiddleware = async (
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
 
-  let tokenVerifyPayload;
+  let jwtPayload;
 
   if (!token) {
     return res
@@ -50,9 +51,8 @@ export const autheMiddleware = async (
   }
 
   try {
-    tokenVerifyPayload = jwt.verify(token, EXPRESS_SECRET);
-    if (typeof tokenVerifyPayload !== "object")
-      throw new Error("Invalid token");
+    jwtPayload = jwt.verify(token, EXPRESS_SECRET);
+    if (typeof jwtPayload !== "object") throw new Error("Invalid token");
   } catch (error) {
     return res.status(401).json({ error: "Invalid token" });
   }
@@ -70,7 +70,7 @@ export const autheMiddleware = async (
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    res.locals.tokenVerifyPayload = tokenVerifyPayload;
+    res.locals.jwtPayload = jwtPayload;
     res.locals.token = token;
 
     next();
@@ -79,30 +79,38 @@ export const autheMiddleware = async (
   }
 };
 
+const RESOURCE_ROLE_ACCESSS_MAP = {
+  "/api/users": ["admin"],
+  "/api/user-details": ["admin"],
+};
+
 /**
  * Middleware to authorize the user
  *
  * This middleware checks if the user has the required role to access the resource
  */
-export const authoMiddleware = async (
-  _req: Request,
+export const authzMiddleware = async (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { user } = res.locals;
+  const { jwtPayload } = res.locals;
+  const { _userId, roleId } = jwtPayload || {};
+
+  const fullPath = normalizePath(req.baseUrl + req.path);
+  const requiredRoles = RESOURCE_ROLE_ACCESSS_MAP[fullPath];
 
   try {
     const [userRole] = await db
       .select()
-      .from(userRoles)
-      .where(eq(userRoles.userId, user));
+      .from(roles)
+      .where(eq(roles.id, roleId));
 
-    // TODO: Check if the user has the required role to access the resource
-
-    if (!userRole) {
+    if (requiredRoles && !requiredRoles.includes(userRole.name)) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
+    // TODO: for now, allow implicit access to all unmapped routes
     next();
   } catch (error) {
     res.status(500).json({ error: error.message });

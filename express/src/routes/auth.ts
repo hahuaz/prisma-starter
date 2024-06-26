@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 
 import { db } from "@/db/drizzle";
 import { authentications, userRoles, users } from "@/db/drizzle/schema";
-import { autheMiddleware } from "@/middleware";
+import { authnMiddleware } from "@/middleware";
 
 export const authRouter = express.Router();
 
@@ -37,7 +37,7 @@ authRouter.post("/login", async (req, res) => {
     const [userRole] = await db
       .select()
       .from(userRoles)
-      .where(eq(authentications.userId, user.id));
+      .where(eq(userRoles.userId, user.id));
 
     const token = jwt.sign(
       { userId: user.id, roleId: userRole.roleId },
@@ -60,9 +60,9 @@ authRouter.post("/login", async (req, res) => {
 });
 
 // Logout route
-authRouter.post("/logout", autheMiddleware, async (req, res) => {
+authRouter.post("/logout", authnMiddleware, async (req, res) => {
   let {
-    tokenVerifyPayload: { userId },
+    jwtPayload: { userId },
     token,
   } = res.locals;
 

@@ -3,12 +3,12 @@ import express from "express";
 
 import { db } from "@/db/drizzle";
 import { userDetails, users } from "@/db/drizzle/schema";
-import { autheMiddleware, orderByMiddleware } from "@/middleware";
+import { authnMiddleware, orderByMiddleware } from "@/middleware";
 
 export const userDetailsRouter = express.Router();
 
 // Create new user details
-userDetailsRouter.post("/", autheMiddleware, async (req, res) => {
+userDetailsRouter.post("/", authnMiddleware, async (req, res) => {
   const { userId, fullName, birthDate, address } = req.body;
 
   const intUserId = parseInt(userId, 10);
@@ -35,7 +35,7 @@ userDetailsRouter.post("/", autheMiddleware, async (req, res) => {
 });
 
 // Get user details by ID
-userDetailsRouter.get("/:id", autheMiddleware, async (req, res) => {
+userDetailsRouter.get("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
 
@@ -59,7 +59,7 @@ userDetailsRouter.get("/:id", autheMiddleware, async (req, res) => {
 });
 
 // Update user details by ID
-userDetailsRouter.patch("/:id", autheMiddleware, async (req, res) => {
+userDetailsRouter.patch("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   const { fullName, birthDate, address } = req.body;
@@ -77,7 +77,7 @@ userDetailsRouter.patch("/:id", autheMiddleware, async (req, res) => {
 });
 
 // Delete user details by ID
-userDetailsRouter.delete("/:id", autheMiddleware, async (req, res) => {
+userDetailsRouter.delete("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
   try {
@@ -91,7 +91,7 @@ userDetailsRouter.delete("/:id", autheMiddleware, async (req, res) => {
 // Get all user details
 userDetailsRouter.get(
   "/",
-  autheMiddleware,
+  authnMiddleware,
   orderByMiddleware,
   async (_req, res) => {
     const { orderByColumn, orderByDirection } = res.locals;
