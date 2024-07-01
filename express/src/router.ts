@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 
 import { authRouter, userDetailsRouter, usersRouter } from "@/routes";
 
-import { corsMiddleware } from "./middleware";
+import { corsMiddleware, errorMiddleware } from "./middleware";
 
 const apiRouter = express.Router();
 
@@ -25,6 +25,8 @@ apiRouter
  */
 export const setupRouter = (app: Express) => {
   app.use("/api", apiRouter);
+
+  app.use(errorMiddleware);
 
   return app;
 };

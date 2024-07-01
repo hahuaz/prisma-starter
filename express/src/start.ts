@@ -4,7 +4,9 @@ import { getRabbitMQChannel } from "@/config/rabbitmq";
 import redis from "@/config/redis";
 import { connectDrizzle } from "@/db/drizzle";
 
-const { APP_PORT } = process.env;
+import config from "./config";
+
+const { APP_PORT } = config;
 
 /**
  * Connect to services and start the app

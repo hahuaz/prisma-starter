@@ -3,18 +3,14 @@ import { and, eq } from "drizzle-orm";
 import express from "express";
 import * as jwt from "jsonwebtoken";
 
+import config from "@/config";
 import { db } from "@/db/drizzle";
 import { authentications, userRoles, users } from "@/db/drizzle/schema";
 import { authnMiddleware } from "@/middleware";
 
-export const authRouter = express.Router();
+const { EXPRESS_SECRET, TOKEN_EXPIRATION } = config;
 
-const { EXPRESS_SECRET } = process.env;
-if (!EXPRESS_SECRET) {
-  console.error("EXPRESS_SECRET is not set");
-  process.exit(1);
-}
-const TOKEN_EXPIRATION = "1h";
+export const authRouter = express.Router();
 
 // Login route
 authRouter.post("/login", async (req, res) => {

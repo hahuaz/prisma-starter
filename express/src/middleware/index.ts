@@ -2,15 +2,12 @@ import { and, eq } from "drizzle-orm";
 import express, { Express, NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 
+import config from "@/config";
 import { db } from "@/db/drizzle";
 import { authentications, roles, userRoles, users } from "@/db/drizzle/schema";
 import { normalizePath } from "@/lib";
 
-const { EXPRESS_SECRET } = process.env;
-if (!EXPRESS_SECRET) {
-  console.error("EXPRESS_SECRET is not set");
-  process.exit(1);
-}
+const { EXPRESS_SECRET, IS_DEV } = config;
 
 /**
  * Middleware to parse and attach orderBy query params to request object
@@ -106,7 +103,7 @@ export const authzMiddleware = async (
       .from(roles)
       .where(eq(roles.id, roleId));
 
-    if (requiredRoles && !requiredRoles.includes(userRole.name)) {
+    if (!requiredRoles?.includes(userRole.name)) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
@@ -136,4 +133,24 @@ export const corsMiddleware = (
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   next();
+};
+
+/**
+ * It handles any errors that occur during the request/response cycle.
+ * It must be the last middleware added to the app.
+ * When an error is passed to the `next` function, it will be caught here.
+ */
+export const errorMiddleware = (
+  err: Error,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  const resPayload: { errorMessage: string; stack?: string } = {
+    errorMessage: err.message,
+  };
+
+  IS_DEV ?? (resPayload.stack = err.stack);
+
+  res.status(500).json(resPayload);
 };
