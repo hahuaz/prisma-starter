@@ -21,12 +21,17 @@ export class App {
     this.app.use("/api", apiRouter);
 
     await this.connectDrizzle();
+
     await this.connectRedis();
+
     await this.connectRabbitMQ();
-    // TODO is this the right place to assert the queue?
+    // publisher creates queue to fasten the process
     await this.rabbitMQChannel.assertQueue("validate-name");
 
+    this.serveStatic();
+
     this.app.use(errorMiddleware);
+
     this.app.listen(APP_PORT, () => {
       console.log(
         `You can ping to express app on http://localhost:${APP_PORT}/api/ping`
@@ -56,10 +61,8 @@ export class App {
     let attempts = 0;
     while (attempts < retries) {
       try {
-        console.log("Attempt to connect RabbitMQ...");
         const connection = await amqplib.connect("amqp://rabbitmq:5672");
         this.rabbitMQChannel = await connection.createChannel();
-        console.log("Connected to RabbitMQ");
         break; // Exit the loop if connection is successful
       } catch (error) {
         if (attempts === retries - 1) {
@@ -80,6 +83,15 @@ export class App {
         await sleep(delay);
       }
     }
+  }
+
+  private serveStatic() {
+    this.app.use(
+      express.static("public", {
+        // index: true,
+        dotfiles: "ignore",
+      })
+    );
   }
 }
 
