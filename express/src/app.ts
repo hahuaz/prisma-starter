@@ -1,10 +1,11 @@
 import amqplib, { Channel } from "amqplib";
 import express from "express";
+import helmet, { HelmetOptions } from "helmet";
 
 import config from "@/config";
 import { pg, redis } from "@/db";
 import { sleep } from "@/lib";
-import { errorMiddleware } from "@/middleware";
+import { corsMiddleware, errorMiddleware } from "@/middleware";
 import { apiRouter } from "@/routes/api";
 
 const { APP_PORT } = config;
@@ -18,17 +19,17 @@ export class App {
   }
 
   public async bootstrap() {
+    this.setAppMiddlewares();
+    this.serveStatic();
     this.app.use("/api", apiRouter);
-
     await this.connectDrizzle();
-
     await this.connectRedis();
-
     await this.connectRabbitMQ();
     // publisher creates queue to fasten the process
     await this.rabbitMQChannel.assertQueue("validate-name");
 
-    this.serveStatic();
+    // TODO: cron jobs
+    // TODO: use smtp for email sending
 
     this.app.use(errorMiddleware);
 
@@ -92,6 +93,12 @@ export class App {
         dotfiles: "ignore",
       })
     );
+  }
+
+  private setAppMiddlewares() {
+    const helmetOptions: HelmetOptions = {};
+    this.app.use(helmet(helmetOptions));
+    this.app.use(corsMiddleware);
   }
 }
 

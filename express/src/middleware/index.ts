@@ -122,9 +122,7 @@ export const corsMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  if (process.env.NODE_ENV !== "development") {
-    return next();
-  }
+  if (!IS_DEV) return next();
 
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");

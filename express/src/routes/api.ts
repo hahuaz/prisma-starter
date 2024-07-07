@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 
-import { corsMiddleware } from "@/middleware";
 import { authRouter } from "@/routes/auth";
 import { userDetailsRouter } from "@/routes/user-details";
 import { usersRouter } from "@/routes/users";
@@ -11,7 +10,6 @@ export const apiRouter = express.Router();
 apiRouter.use(express.urlencoded({ extended: true }));
 // parse application/json in api routes
 apiRouter.use(express.json());
-apiRouter.use(corsMiddleware);
 
 apiRouter
   .get("/ping", async (_req: Request, res: Response) => {
