@@ -1,29 +1,31 @@
-const { EXPRESS_SECRET, NODE_ENV, APP_PORT, REDIS_URL } = process.env;
+const { EXPRESS_SECRET, APP_PORT, REDIS_URL, DATABASE_URL, NODE_ENV } =
+  process.env;
 
-if (!EXPRESS_SECRET) {
-  console.error("EXPRESS_SECRET is not set");
-  process.exit(1);
-}
+const requiredEnvVars = [
+  "EXPRESS_SECRET",
+  "APP_PORT",
+  "REDIS_URL",
+  "DATABASE_URL",
+];
 
-if (!APP_PORT) {
-  console.error("APP_PORT is not set");
-  process.exit(1);
-}
-
-if (!REDIS_URL) {
-  console.error("REDIS_URL is not set");
-  process.exit(1);
+for (let i = 0; i < requiredEnvVars.length; i++) {
+  const envVar = requiredEnvVars[i];
+  if (!process.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
 }
 
 const config: {
+  REDIS_URL: string;
+  DATABASE_URL: string;
   EXPRESS_SECRET: string;
   TOKEN_EXPIRATION: string;
-  REDIS_URL: string;
   IS_DEV: boolean;
   APP_PORT: number;
 } = {
-  EXPRESS_SECRET,
   REDIS_URL,
+  DATABASE_URL: DATABASE_URL,
+  EXPRESS_SECRET,
   TOKEN_EXPIRATION: "1h",
   APP_PORT: parseInt(APP_PORT),
   IS_DEV: NODE_ENV === "development",

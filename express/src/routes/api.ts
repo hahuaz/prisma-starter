@@ -1,10 +1,11 @@
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 
-import { authRouter, userDetailsRouter, usersRouter } from "@/routes";
+import { corsMiddleware } from "@/middleware";
+import { authRouter } from "@/routes/auth";
+import { userDetailsRouter } from "@/routes/user-details";
+import { usersRouter } from "@/routes/users";
 
-import { corsMiddleware, errorMiddleware } from "./middleware";
-
-const apiRouter = express.Router();
+export const apiRouter = express.Router();
 
 // parse application/x-www-form-urlencoded in api routes
 apiRouter.use(express.urlencoded({ extended: true }));
@@ -20,13 +21,4 @@ apiRouter
   .use("/users", usersRouter)
   .use("/user-details", userDetailsRouter);
 
-/**
- * Setup the routes for the express app
- */
-export const setupRouter = (app: Express) => {
-  app.use("/api", apiRouter);
-
-  app.use(errorMiddleware);
-
-  return app;
-};
+export default apiRouter;

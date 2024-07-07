@@ -2,14 +2,11 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Client } from "pg";
 
+import config from "@/config";
+
 import { ROLES, roles } from "./schema";
 
-const { DATABASE_URL } = process.env;
-
-if (!DATABASE_URL) {
-  console.error("DATABASE_URL is not set!");
-  process.exit(1);
-}
+const { DATABASE_URL } = config;
 
 const connection = new Client({
   connectionString: DATABASE_URL,
