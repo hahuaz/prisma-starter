@@ -1,4 +1,4 @@
-const { EXPRESS_SECRET, NODE_ENV, APP_PORT } = process.env;
+const { EXPRESS_SECRET, NODE_ENV, APP_PORT, REDIS_URL } = process.env;
 
 if (!EXPRESS_SECRET) {
   console.error("EXPRESS_SECRET is not set");
@@ -10,16 +10,23 @@ if (!APP_PORT) {
   process.exit(1);
 }
 
+if (!REDIS_URL) {
+  console.error("REDIS_URL is not set");
+  process.exit(1);
+}
+
 const config: {
   EXPRESS_SECRET: string;
   TOKEN_EXPIRATION: string;
+  REDIS_URL: string;
   IS_DEV: boolean;
   APP_PORT: number;
 } = {
   EXPRESS_SECRET,
+  REDIS_URL,
   TOKEN_EXPIRATION: "1h",
-  IS_DEV: NODE_ENV === "development",
   APP_PORT: parseInt(APP_PORT),
+  IS_DEV: NODE_ENV === "development",
 };
 
 export default config;
