@@ -5,7 +5,6 @@
     "outDir": "dist",
     "sourceMap": true,
     "esModuleInterop": true,
-    // "skipLibCheck": false,
 
     "baseUrl": "./",
     "paths": {
