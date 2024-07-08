@@ -10,6 +10,10 @@ import { apiRouter } from "@/routes/api";
 
 const { APP_PORT } = config;
 
+// TODO: implement docs
+// TODO: implement cron jobs
+// TODO: use smtp for email sending
+
 export class App {
   private app: express.Application = express();
   private rabbitMQChannel: Channel;
@@ -27,9 +31,6 @@ export class App {
     await this.connectRabbitMQ();
     // publisher creates queue to fasten the process
     await this.rabbitMQChannel.assertQueue("validate-name");
-
-    // TODO: cron jobs
-    // TODO: use smtp for email sending
 
     this.app.use(errorMiddleware);
 
