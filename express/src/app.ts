@@ -1,10 +1,11 @@
 import amqplib, { Channel } from "amqplib";
 import express from "express";
 import helmet, { HelmetOptions } from "helmet";
+import path from "path";
 
 import config from "@/config";
 import { pg, redis } from "@/db";
-import { sleep } from "@/lib";
+import { ephemeralStorage, sleep } from "@/lib";
 import { corsMiddleware, errorMiddleware } from "@/middleware";
 import { apiRouter } from "@/routes/api";
 
@@ -19,7 +20,7 @@ export class App {
   private rabbitMQChannel: Channel;
 
   constructor() {
-    this.bootstrap();
+    void this.bootstrap();
   }
 
   public async bootstrap() {
@@ -37,6 +38,10 @@ export class App {
     this.app.listen(APP_PORT, () => {
       console.log(
         `You can ping to express app on http://localhost:${APP_PORT}/api/ping`
+      );
+      void ephemeralStorage.put(
+        "bootstrap.txt",
+        `Express app is running on port ${APP_PORT} at ${new Date()}`
       );
     });
   }
@@ -89,7 +94,7 @@ export class App {
 
   private serveStatic() {
     this.app.use(
-      express.static("public", {
+      express.static(path.join(__dirname, "..", "public", "frontend"), {
         // index: true,
         dotfiles: "ignore",
       })
