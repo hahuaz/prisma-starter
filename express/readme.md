@@ -1,5 +1,5 @@
 TODO:
-1. start the app after build
+1. start the app after the build. what is the best practice for building and starting the app?
 2. use tsx instead of ts-node
 
 
