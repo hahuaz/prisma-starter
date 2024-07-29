@@ -37,8 +37,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./express:/express # sync files between host and container to enable hot-reloading
-      - /express/node_modules # do not share node_modules from host to container. Basically, you are specifying the directories that shouldn't be reloaded in the container
+      - ./express:/express # bi-directional syncing files between host and container to enable hot-reloading.
+      - /express/node_modules # cancel syncing for a specific directory by providing only host directory without colon and container directory.
   worker:
     container_name: worker
     stdin_open: true
