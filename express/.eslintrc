@@ -1,7 +1,12 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": ["plugin:@typescript-eslint/recommended"],
-  "parserOptions": { "ecmaVersion": 2018, "sourceType": "module" },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    // TODO: how to use app directory as root?
+    "project": "./express/tsconfig.json"
+  },
   "plugins": ["@typescript-eslint", "simple-import-sort"],
   "rules": {
     "simple-import-sort/imports": "error",
@@ -13,6 +18,9 @@
         "varsIgnorePattern": "^_",
         "argsIgnorePattern": "^_"
       }
-    ]
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-floating-promises": "warn"
   }
 }
