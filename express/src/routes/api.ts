@@ -18,14 +18,11 @@ apiRouter
     try {
       // throw new Error("This is an error");
       const resBody = {
-        message: "r",
-        password: "r",
-        nested: { password: "r" },
-        nestedArr: [{ password: "r" }],
+        message: "pong",
       };
       res.json(resBody);
     } catch (error) {
-      res.locals.error = error as Error;
+      res.locals.error = error;
       res.status(500).json({
         message: "Internal Server Error",
       });
