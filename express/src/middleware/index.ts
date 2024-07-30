@@ -137,7 +137,7 @@ export const corsMiddleware = (
 /**
  * It handles any errors that occur during the request/response cycle.
  * It must be the last middleware added to the app.
- * When an error is passed to the `next` function, it will be caught here.
+ * When an error is passed to the `next` function, it will be caught and passed to this middleware.
  */
 export const errorMiddleware = (
   err: Error,
@@ -145,18 +145,23 @@ export const errorMiddleware = (
   res: Response,
   _next: NextFunction
 ) => {
+  // TODO: you can get status code from error object instead of always using 500
+
+  // pass error to locals so logger middleware can access it
+  res.locals.error = err;
   const resPayload: { errorMessage: string; stack?: string } = {
     errorMessage: err.message,
   };
 
-  IS_DEV ?? (resPayload.stack = err.stack);
+  IS_DEV && (resPayload.stack = err.stack);
 
   res.status(500).json(resPayload);
 };
 
 /**
- * Middleware to log the HTTP request and response
- * It should be used before any other middleware or route
+ * Middleware to log the HTTP request and response.
+ * It should be used before any other middleware or route.
+ * Currently it can only log api route calls since it relies on the res.send method.
  */
 export const httpLogMiddleware = (
   req: Request,
@@ -186,7 +191,7 @@ export const httpLogMiddleware = (
       );
     }
 
-    // pass this (response object) to the original send method because it's internally used by express
+    // pass this, response object, to the original send method because it's internally used by express
     return originalSend.call(this, resBody);
   };
 

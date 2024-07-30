@@ -14,7 +14,7 @@ apiRouter.use(express.urlencoded({ extended: true }));
 apiRouter.use(express.json());
 
 apiRouter
-  .get("/ping", async (_req: Request, res: Response) => {
+  .get("/ping", async (_req: Request, res: Response, next) => {
     try {
       // throw new Error("This is an error");
       const resBody = {
@@ -22,10 +22,8 @@ apiRouter
       };
       res.json(resBody);
     } catch (error) {
-      res.locals.error = error;
-      res.status(500).json({
-        message: "Internal Server Error",
-      });
+      // call next with error to trigger error handling middleware
+      next(error);
     }
   })
   .use("/auth", authRouter)
