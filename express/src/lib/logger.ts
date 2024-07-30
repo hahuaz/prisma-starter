@@ -13,7 +13,7 @@ export const httpLogger = winston.createLogger({
         level,
         message,
         data,
-        timestamp,
+        timestamp: timestamp as string,
       };
 
       return JSON.stringify(response);
@@ -22,11 +22,17 @@ export const httpLogger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-export const formatHTTPLoggerData = (
-  req: express.Request,
-  res: express.Response,
-  responseBody: any
-) => {
+export const formatHTTPLoggerData = ({
+  req,
+  res,
+  resBody,
+  error,
+}: {
+  req: express.Request;
+  res: express.Response;
+  resBody?: unknown;
+  error?: Error;
+}) => {
   return {
     request: {
       headers: req.headers,
@@ -34,7 +40,7 @@ export const formatHTTPLoggerData = (
       baseUrl: req.baseUrl,
       url: req.url,
       method: req.method,
-      body: req.body,
+      body: req.body as unknown,
       params: req.params,
       query: req.query,
       clientIp: req.headers["x-forwarded-for"] ?? req.socket.remoteAddress,
@@ -42,7 +48,14 @@ export const formatHTTPLoggerData = (
     response: {
       headers: res.getHeaders(),
       statusCode: res.statusCode,
-      body: responseBody,
+      body: resBody,
     },
+    error: error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        }
+      : undefined,
   };
 };

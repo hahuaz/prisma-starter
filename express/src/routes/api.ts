@@ -14,9 +14,18 @@ apiRouter.use(express.json());
 
 apiRouter
   .get("/ping", async (req: Request, res: Response) => {
-    const resBody = { message: "pong" };
-    res.json(resBody);
-    httpLogger.info("success", formatHTTPLoggerData(req, res, resBody));
+    try {
+      // throw new Error("This is an error");
+      const resBody = { message: "pong" };
+      res.json(resBody);
+      httpLogger.info("success", formatHTTPLoggerData({ req, res, resBody }));
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+      httpLogger.error(
+        "error",
+        formatHTTPLoggerData({ req, res, error: error as Error })
+      );
+    }
   })
   .use("/auth", authRouter)
   .use("/users", usersRouter)
