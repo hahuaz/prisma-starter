@@ -7,3 +7,5 @@ Local first Express.js starter project with the purpose of being a reference for
 - [Drizzle](https://orm.drizzle.team/): ORM for Node.js.
 - [Redis](https://redis.io/): Memory caching system.
 - [RabbitMQ](https://www.rabbitmq.com/): Message broker.
+- [Winston](https://github.com/winstonjs/winston): HTTP logger.
+- [Nodemailer](https://nodemailer.com/): Email sender.

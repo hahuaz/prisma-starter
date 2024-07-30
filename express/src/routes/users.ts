@@ -4,6 +4,7 @@ import express from "express";
 
 import { db } from "@/db/drizzle";
 import { roles, userDetails, userRoles, users } from "@/db/drizzle/schema";
+import { sendEmail } from "@/lib";
 import {
   authnMiddleware,
   authzMiddleware,
@@ -44,6 +45,13 @@ usersRouter.post("/", async (req, res) => {
     await db.insert(userRoles).values({
       userId: newUser.id,
       roleId: viewerRoleId,
+    });
+
+    await sendEmail({
+      to: email,
+      subject: "Welcome to express-starter!",
+      text: `Welcome, ${username}!`,
+      html: `<p>Welcome, ${username}!</p>`,
     });
 
     res.status(201).json(newUser);
