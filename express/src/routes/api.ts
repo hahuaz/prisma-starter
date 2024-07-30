@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 
+import { formatHTTPLoggerData, httpLogger } from "@/lib";
 import { authRouter } from "@/routes/auth";
 import { userDetailsRouter } from "@/routes/user-details";
 import { usersRouter } from "@/routes/users";
@@ -12,8 +13,10 @@ apiRouter.use(express.urlencoded({ extended: true }));
 apiRouter.use(express.json());
 
 apiRouter
-  .get("/ping", async (_req: Request, res: Response) => {
-    res.json({ message: "pong" });
+  .get("/ping", async (req: Request, res: Response) => {
+    const resBody = { message: "pong" };
+    res.json(resBody);
+    httpLogger.info("success", formatHTTPLoggerData(req, res, resBody));
   })
   .use("/auth", authRouter)
   .use("/users", usersRouter)
