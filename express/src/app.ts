@@ -27,9 +27,13 @@ export class App {
     this.setAppMiddlewares();
     this.serveStatic();
     this.app.use("/api", apiRouter);
-    await this.connectDrizzle();
-    await this.connectRedis();
-    await this.connectRabbitMQ();
+
+    await Promise.all([
+      this.connectDrizzle(),
+      this.connectRedis(),
+      this.connectRabbitMQ(),
+    ]);
+
     // publisher creates queue to fasten the process
     await this.rabbitMQChannel.assertQueue("validate-name");
 
