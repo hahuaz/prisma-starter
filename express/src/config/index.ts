@@ -22,6 +22,8 @@ const config: {
   EXPRESS_SECRET: string;
   TOKEN_EXPIRATION: string;
   APP_PORT: number;
+  APP_VERSION: string | undefined;
+  NODE_ENV: string;
   IS_DEV: boolean;
   IS_PROD: boolean;
 } = {
@@ -30,6 +32,8 @@ const config: {
   EXPRESS_SECRET,
   TOKEN_EXPIRATION: "1h",
   APP_PORT: parseInt(APP_PORT),
+  APP_VERSION: process.env.npm_package_version,
+  NODE_ENV,
   IS_DEV: NODE_ENV === "development",
   IS_PROD: NODE_ENV === "production",
 };
