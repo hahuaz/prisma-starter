@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 
-import { httpLogMiddleware } from "@/lib";
+import { httpLogMiddleware } from "@/middleware";
 import { authRouter } from "@/routes/auth";
 import { userDetailsRouter } from "@/routes/user-details";
 import { usersRouter } from "@/routes/users";

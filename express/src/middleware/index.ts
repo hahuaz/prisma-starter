@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 import config from "@/config";
 import { db } from "@/db/drizzle";
 import { authentications, roles, userRoles, users } from "@/db/drizzle/schema";
+import { httpLogger } from "@/lib";
 import { normalizePath } from "@/lib";
 
 const { EXPRESS_SECRET, IS_DEV } = config;
@@ -151,4 +152,41 @@ export const errorMiddleware = (
   IS_DEV ?? (resPayload.stack = err.stack);
 
   res.status(500).json(resPayload);
+};
+
+/**
+ * Middleware to log the HTTP request and response
+ * It should be used before any other middleware or route
+ */
+export const httpLogMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const originalSend = res.send;
+  let isResponseSent = false;
+
+  res.send = function (resBody) {
+    if (!isResponseSent) {
+      if (res.statusCode < 400) {
+        httpLogger.info({ req, res, resBody });
+      } else {
+        httpLogger.error({
+          req,
+          res,
+          resBody,
+          error: res.locals.error as Error,
+        });
+      }
+      isResponseSent = true;
+    } else {
+      console.warn(
+        "Response is already sent, cannot log the response data again"
+      );
+    }
+
+    return originalSend.call(this, resBody);
+  };
+
+  next();
 };
