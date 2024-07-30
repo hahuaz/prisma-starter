@@ -92,6 +92,8 @@ class HTTPLogger {
       },
       response: {
         headers: res.getHeaders(),
+        // duration in seconds
+        duration: (Date.now() - res.locals.reqStartTime) / 1000,
         statusCode: res.statusCode,
         body: this.redactSensitiveData(resBody as AnyObj),
       },
@@ -105,36 +107,17 @@ class HTTPLogger {
     };
   }
 
-  info({
-    req,
-    res,
-    resBody,
-  }: {
-    req: Request;
-    res: Response;
-    resBody: unknown;
-  }) {
-    this.logger.info(
-      "success",
-      this.formatHTTPLoggerData({ req, res, resBody })
-    );
+  info(payload: { req: Request; res: Response; resBody: unknown }) {
+    this.logger.info("success", this.formatHTTPLoggerData(payload));
   }
 
-  error({
-    req,
-    res,
-    resBody,
-    error,
-  }: {
+  error(payload: {
     req: Request;
     res: Response;
     resBody: unknown;
     error: Error;
   }) {
-    this.logger.error(
-      "error",
-      this.formatHTTPLoggerData({ req, res, resBody, error })
-    );
+    this.logger.error("error", this.formatHTTPLoggerData(payload));
   }
   // force singleton by marking constructor as private
   public static init(): HTTPLogger {

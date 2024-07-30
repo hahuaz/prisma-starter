@@ -163,6 +163,7 @@ export const httpLogMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
+  res.locals.reqStartTime = Date.now();
   const originalSend = res.send;
   let isResponseSent = false;
 
