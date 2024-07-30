@@ -4,10 +4,13 @@ import winston from "winston";
 import config from "@/config";
 import { generateRandomHex } from "@/lib";
 
-const { NODE_ENV, APP_VERSION } = config;
+const {
+  NODE_ENV,
+  APP_VERSION,
+  FORMAT: { TIME_FORMAT },
+} = config;
 
 const { combine, timestamp, json, printf } = winston.format;
-const timestampFormat = "MMM-DD-YYYY HH:mm:ss";
 
 import { redact } from "@/lib";
 import { AnyObj } from "@/types";
@@ -19,7 +22,7 @@ class HTTPLogger {
   private constructor() {
     this.logger = winston.createLogger({
       format: combine(
-        timestamp({ format: timestampFormat }),
+        timestamp({ format: TIME_FORMAT }),
         json(),
         printf(({ timestamp, level, message, ...data }) => {
           const response = {

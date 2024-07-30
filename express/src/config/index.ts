@@ -16,6 +16,14 @@ for (let i = 0; i < requiredEnvVars.length; i++) {
   }
 }
 
+type TFortmat = {
+  TIME_FORMAT: string;
+};
+
+const FORMAT: TFortmat = {
+  TIME_FORMAT: "YYYY-MM-DD HH:mm:ss",
+};
+
 const config: {
   REDIS_URL: string;
   DATABASE_URL: string;
@@ -26,6 +34,7 @@ const config: {
   NODE_ENV: string;
   IS_DEV: boolean;
   IS_PROD: boolean;
+  FORMAT: TFortmat;
 } = {
   REDIS_URL,
   DATABASE_URL: DATABASE_URL,
@@ -36,7 +45,8 @@ const config: {
   NODE_ENV,
   IS_DEV: NODE_ENV === "development",
   IS_PROD: NODE_ENV === "production",
+  FORMAT,
 };
-console.log("config:\n", config);
+console.log("config:", config);
 
 export default config;
