@@ -17,11 +17,18 @@ apiRouter
   .get("/ping", async (_req: Request, res: Response) => {
     try {
       // throw new Error("This is an error");
-      const resBody = { message: "pong" };
+      const resBody = {
+        message: "r",
+        password: "r",
+        nested: { password: "r" },
+        nestedArr: [{ password: "r" }],
+      };
       res.json(resBody);
     } catch (error) {
       res.locals.error = error as Error;
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
     }
   })
   .use("/auth", authRouter)

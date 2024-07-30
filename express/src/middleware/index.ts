@@ -73,7 +73,7 @@ export const authnMiddleware = async (
 
     next();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message as string });
   }
 };
 
@@ -111,7 +111,7 @@ export const authzMiddleware = async (
     // TODO: for now, allow implicit access to all unmapped routes
     next();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message as string });
   }
 };
 
@@ -185,6 +185,7 @@ export const httpLogMiddleware = (
       );
     }
 
+    // pass this (response object) to the original send method because it's internally used by express
     return originalSend.call(this, resBody);
   };
 

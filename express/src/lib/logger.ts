@@ -9,6 +9,9 @@ const { NODE_ENV, APP_VERSION } = config;
 const { combine, timestamp, json, printf } = winston.format;
 const timestampFormat = "MMM-DD-YYYY HH:mm:ss";
 
+import { redact } from "@/lib";
+import { AnyObj } from "@/types";
+
 class HTTPLogger {
   private static instance: HTTPLogger;
   private logger: winston.Logger;
@@ -39,6 +42,28 @@ class HTTPLogger {
     });
   }
 
+  /**
+   * Redact sensitive data from the log by looping through the object or array
+   */
+  redactSensitiveData(data: AnyObj | AnyObj[] | string) {
+    const redactEnums = [
+      "password",
+      "oldPassword",
+      "newPassword",
+      "repeatPassword",
+      "token",
+      "refreshToken",
+      "authorization",
+    ];
+
+    const redactedData = redact({
+      data,
+      redactEnums,
+    });
+
+    return redactedData;
+  }
+
   formatHTTPLoggerData({
     req,
     res,
@@ -57,7 +82,7 @@ class HTTPLogger {
         baseUrl: req.baseUrl,
         url: req.url,
         method: req.method,
-        body: req.body as unknown,
+        body: this.redactSensitiveData(req.body as AnyObj),
         params: req.params,
         query: req.query,
         clientIp: req.headers["x-forwarded-for"] ?? req.socket.remoteAddress,
@@ -65,7 +90,7 @@ class HTTPLogger {
       response: {
         headers: res.getHeaders(),
         statusCode: res.statusCode,
-        body: resBody,
+        body: this.redactSensitiveData(resBody as AnyObj),
       },
       error: error
         ? {
@@ -108,7 +133,6 @@ class HTTPLogger {
       this.formatHTTPLoggerData({ req, res, resBody, error })
     );
   }
-
   // force singleton by marking constructor as private
   public static init(): HTTPLogger {
     if (!this.instance) {
