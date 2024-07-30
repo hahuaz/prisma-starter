@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import winston from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
 import config from "@/config";
 import { generateRandomHex } from "@/lib";
@@ -41,7 +42,16 @@ class HTTPLogger {
           return JSON.stringify(response);
         })
       ),
-      transports: [new winston.transports.Console()],
+      transports: [
+        new winston.transports.Console(),
+        new DailyRotateFile({
+          filename: "logs/http-logs-%DATE%.log",
+          datePattern: "YYYY-MM-DD",
+          zippedArchive: false,
+          maxSize: "20m",
+          // maxFiles: "14d",
+        }),
+      ],
     });
   }
 

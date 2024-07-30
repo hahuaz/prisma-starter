@@ -1,7 +1,10 @@
 node_modules
-# Keep environment variables out of version control
+# keep environment variables out of version control
 .env
-# Ignore the local directory which keeps any refs for users to use
+# ignore the local directory which keeps any refs for users to use
 local
+# ignore logs directory
+logs
+# ignore the ephemeral storage directory with empty .gitkeep file
 public/ephemeral-storage/*
 !public/ephemeral-storage/.gitkeep
