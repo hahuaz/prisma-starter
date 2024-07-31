@@ -12,8 +12,6 @@ import { apiRouter } from "@/routes/api";
 const { APP_PORT } = config;
 
 // TODO: implement docs
-// TODO: implement cron jobs
-// TODO: use smtp for email sending
 
 export class App {
   private app: express.Application = express();

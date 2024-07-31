@@ -9,3 +9,4 @@ Local first Express.js starter project with the purpose of being a reference for
 - [RabbitMQ](https://www.rabbitmq.com/): Message broker.
 - [Winston](https://github.com/winstonjs/winston): HTTP logger.
 - [Nodemailer](https://nodemailer.com/): Email sending via worker.
+- [Nodecron](https://www.npmjs.com/package/node-cron): Cron job via worker.
