@@ -42,6 +42,8 @@ services:
   worker:
     container_name: worker
     stdin_open: true
+    env_file:
+      - .env.local
     build:
       context: ./worker
     depends_on:

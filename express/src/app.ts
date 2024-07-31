@@ -35,7 +35,7 @@ export class App {
     ]);
 
     // publisher creates queue to fasten the process
-    await this.rabbitMQChannel.assertQueue("validate-name");
+    await this.rabbitMQChannel.assertQueue("welcome-email");
 
     this.app.use(errorMiddleware);
 
@@ -110,6 +110,14 @@ export class App {
     this.app.use(helmet(helmetOptions));
     this.app.use(corsMiddleware);
   }
+
+  public getRabbitMQChannel(): Channel {
+    if (!this.rabbitMQChannel) {
+      throw new Error("RabbitMQ channel is not initialized.");
+    }
+    return this.rabbitMQChannel;
+  }
 }
 
-new App();
+const app = new App();
+export default app;

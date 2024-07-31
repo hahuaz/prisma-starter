@@ -9,7 +9,7 @@
     "prepare": "husky"
   },
   "keywords": [],
-  "author": "",
+  "author": "Hasan Biyik",
   "license": "ISC",
   "devDependencies": {
     "husky": "^9.0.11"

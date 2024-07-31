@@ -2,9 +2,9 @@ import bcrypt from "bcrypt";
 import { desc, eq } from "drizzle-orm";
 import express from "express";
 
+import app from "@/app";
 import { db } from "@/db/drizzle";
 import { roles, userDetails, userRoles, users } from "@/db/drizzle/schema";
-import { sendEmail } from "@/lib";
 import {
   authnMiddleware,
   authzMiddleware,
@@ -13,11 +13,14 @@ import {
 
 export const usersRouter = express.Router();
 
-let viewerRoleId: number;
-
 // Create a new user
-usersRouter.post("/", async (req, res) => {
+usersRouter.post("/", async (req, res, next) => {
+  // you can't use app on the module level since it's not initialized yet when this module is imported
+  const rabbitMQChannel = app.getRabbitMQChannel();
+
   const { username, email, password } = req.body;
+
+  let viewerRoleId: number;
 
   // TODO salt
   const passwordHash = await bcrypt.hash(password, 10);
@@ -47,16 +50,21 @@ usersRouter.post("/", async (req, res) => {
       roleId: viewerRoleId,
     });
 
-    await sendEmail({
-      to: email,
-      subject: "Welcome to express-starter!",
-      text: `Welcome, ${username}!`,
-      html: `<p>Welcome, ${username}!</p>`,
-    });
+    rabbitMQChannel.sendToQueue(
+      "welcome-email",
+      Buffer.from(
+        JSON.stringify({
+          to: email,
+          subject: "Welcome to express-starter!",
+          text: `Welcome, ${username}!`,
+          html: `<p>Welcome, ${username}!</p>`,
+        })
+      )
+    );
 
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 

@@ -135,9 +135,10 @@ export const corsMiddleware = (
 };
 
 /**
- * It handles any errors that occur during the request/response cycle.
- * It must be the last middleware added to the app.
- * When an error is passed to the `next` function, it will be caught and passed to this middleware.
+ * This middleware must be the last one added to the app.
+ * It handles errors in two scenarios:
+ * 1. When an error is passed to the `next` function.
+ * 2. When an uncaught error occurs in asynchronous code.
  */
 export const errorMiddleware = (
   err: Error,
