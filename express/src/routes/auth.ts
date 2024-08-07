@@ -21,6 +21,7 @@ authRouter.post("/login", async (req, res) => {
     const [user] = await db.select().from(users).where(eq(users.email, email));
 
     if (!user) {
+      // TODO turn errorMessages into array.
       return res.status(401).json({ error: "Invalid email or password" });
     }
 

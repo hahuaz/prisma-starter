@@ -1,0 +1,240 @@
+openapi: 3.1.0
+info:
+  title: Express Starter
+  description: |-
+    This is express starter app. Refer to **readme.md** to learn more.
+
+    Some useful links:
+    - [Github repo](https://github.com/hahuaz/express-starter)
+    - [OpenAPI specification](https://swagger.io/specification/)
+  contact:
+    email: yours@yours.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.0
+servers:
+  - url: http://localhost:3000/api/
+tags:
+  - name: users
+    description: Everything about user
+  - name: auth
+    description: Everything about authentication
+paths:
+  /ping:
+    get:
+      summary: Is server up and running?
+      description: Learn if server is up and running
+      operationId: ping
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    examples:
+                      - pong
+        "500":
+          description: Fail
+  /users:
+    post:
+      tags:
+        - users
+      summary: Create user.
+      description: This enables users to sign-up.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ["username", "email", "password"]
+              properties:
+                username:
+                  type: string
+                  examples: ["yours"]
+                email:
+                  type: string
+                  examples: ["yours@mywork.com"]
+                password:
+                  type: string
+                  examples: ["yours"]
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: Get user by user ID.
+      description: ""
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: ""
+      security:
+        - http: []
+    patch:
+      tags:
+        - users
+      summary: Update user
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Update an existent user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        default:
+          description: ""
+      security:
+        - http: []
+    delete:
+      tags:
+        - users
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        default:
+          description: ""
+      security:
+        - http: []
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Create auth token.
+      description: Create auth token to use in protected endpoints.
+      operationId: createToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ["email", "password"]
+              properties:
+                email:
+                  type: string
+                  examples: ["yours@mywork.com"]
+                password:
+                  type: string
+                  examples: ["yours"]
+      responses:
+        "200":
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "401":
+          description: Error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Revoke auth token.
+      description: Revoke auth token.
+      operationId: revokeToken
+      responses:
+        "200":
+          description: Success.
+        "401":
+          description: Error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      security:
+        - http: []
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        username:
+          type: string
+          examples:
+            - theUser
+        email:
+          type: string
+          examples:
+            - john@email.com
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: "##default"
+  requestBodies:
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/User"
+  securitySchemes:
+    http:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,7 +1,10 @@
 import amqplib, { Channel } from "amqplib";
 import express from "express";
+import fs from "fs";
 import helmet, { HelmetOptions } from "helmet";
 import path from "path";
+import swaggerUi from "swagger-ui-express";
+import yaml from "yaml";
 
 import config from "@/config";
 import { pg, redis } from "@/db";
@@ -10,8 +13,6 @@ import { corsMiddleware, errorMiddleware } from "@/middleware";
 import { apiRouter } from "@/routes/api";
 
 const { APP_PORT } = config;
-
-// TODO: implement docs
 
 export class App {
   private app: express.Application = express();
@@ -24,6 +25,7 @@ export class App {
   public async bootstrap() {
     this.setAppMiddlewares();
     this.serveStatic();
+    this.serveDocs();
     this.app.use("/api", apiRouter);
 
     await Promise.all([
@@ -101,6 +103,13 @@ export class App {
         dotfiles: "ignore",
       })
     );
+  }
+
+  private serveDocs() {
+    const swaggerPath = path.join(__dirname, "/docs/openapi3_1.yaml");
+    const swaggerYaml = fs.readFileSync(swaggerPath, "utf8");
+    const swaggerDocument = yaml.parse(swaggerYaml);
+    this.app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 
   private setAppMiddlewares() {

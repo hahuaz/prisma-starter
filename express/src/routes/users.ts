@@ -81,13 +81,16 @@ usersRouter.get("/:id", authnMiddleware, async (req, res) => {
       .where(eq(users.id, intId))
       // you can use left table data(users) in the join condition
       .leftJoin(userDetails, eq(userDetails.userId, users.id));
+    console.log("userwithdetails", userWithDetails);
 
     if (userWithDetails[0]) {
-      const { fullName, address, birthDate } = userWithDetails[0].user_details;
+      // TODO user_details can be null
+      // const { fullName, address, birthDate } = userWithDetails[0].user_details;
 
       const resData = {
+        // TODO redact sensetive info
         ...userWithDetails[0].users,
-        userDetails: { fullName, address, birthDate },
+        // userDetails: { fullName, address, birthDate },
       };
 
       res.status(200).json(resData);
@@ -103,6 +106,7 @@ usersRouter.get("/:id", authnMiddleware, async (req, res) => {
 usersRouter.patch("/:id", authnMiddleware, async (req, res) => {
   const { id } = req.params;
   const intId = parseInt(id, 10);
+  // TODO implement updating password
   const { username, email, passwordHash } = req.body;
   try {
     const updatedUser = await db
